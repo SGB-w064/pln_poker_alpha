@@ -5,7 +5,7 @@ import json
 import numpy
 from gensim.models import fasttext
 
-model_path = "../wiki.ja/wiki.ja.bin"
+model_path = "./models/wiki.ja/wiki.ja.bin"
 model = fasttext.load_facebook_model(model_path)
 
 ##### test func #####
