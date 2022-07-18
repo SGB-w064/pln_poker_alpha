@@ -1,2 +1,5 @@
 # キャッシュ
 __pycache__
+
+# fasttextモデルファイル本体
+/models/wiki.ja/

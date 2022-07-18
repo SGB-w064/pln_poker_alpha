@@ -43,11 +43,13 @@ class GameWindow(QWidget):
         # 単語選択のボタンを並べるレイアウトを作成
         select_word_list = QHBoxLayout()
 
-        for word, weight in test_words.items():
+        # 選択できる単語を並べる
+        for word, _ in test_words.items():
             select_btn = QPushButton(word)
-            select_btn.clicked.connect(self.makeShowScore(calc.test_calc_score(weight, test_plan_list)))
+            select_btn.clicked.connect(self.makeShowScore(calc.calc_score(test_plan_list, word)))
             select_word_list.addWidget(select_btn)
 
+        # ボタンをレイアウトに追加
         layout.addLayout(select_word_list)
         self.w.setLayout(layout)
 
