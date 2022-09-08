@@ -21,3 +21,5 @@ def calc_score(plan_list: dict, word: str):
     similarities_dict = {plan : model.wv.similarity(plan, word).astype(numpy.unicode) for plan in plan_list.keys()}
     
     return json.dumps(similarities_dict, ensure_ascii=False)
+
+# クラス化と処理方法の追加必要
