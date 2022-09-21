@@ -6,3 +6,6 @@ __pycache__
 
 # クライアントの設定ファイル
 /client/config.py
+
+# デバッグ用batファイル
+debug.bat

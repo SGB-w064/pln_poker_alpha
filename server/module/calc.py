@@ -3,6 +3,7 @@
 # socket通信関連
 import socket
 import threading
+import pickle
 
 # fastText関連
 import numpy
@@ -19,18 +20,17 @@ class NLP_COS_SIMILARITY():
     # 接続したクライアントとのやり取り
     def connetClient(self, cl, cla, calc_func):
         while True:
-            data = cl.recv(1024).decode("utf-8")
+            data = pickle.loads(cl.recv(1024))
             
-            # 送られてくるデータは空白が含まれる文字列と仮定
-            # 例 data = "hoge huga"
-            if " " in data:
-                plan, idea = tuple(data.split(" "))
-                cl.send(calc_func(plan, idea).encode("utf-8"))
+            # 送られてくるデータは比較する2つの単語のリストと仮定
+            # 例 data = ["hoge", "huga"]
+            if type(data) is list and len(data) == 2:
+                cl.send(pickle.dumps(calc_func(data[0], data[1])))
             elif data == "end":
                 # 特に理由はないがサーバーを閉じる文字列を含める
                 self.server.close()
             else:
-                # 空白の含まれない上記の文字列以外の文字列が来た場合、単純に返信する
+                # 上記以外のデータが来た場合の返信
                 cl.send("計算失敗".encode("utf-8"))
 
     # サーバーの立ち上げ    
