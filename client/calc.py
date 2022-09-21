@@ -1,6 +1,5 @@
 import socket
 import json
-import pickle
 
 import config
 
@@ -15,9 +14,9 @@ def calc_score(plan_list: dict, word: str):
     cl.connect(adress)
 
     for plan in plan_list:
-        send_data = pickle.dumps([plan, word])
-        cl.send(send_data)
+        send_data = json.dumps({"word1" : plan, "word2" : word})
+        cl.send(send_data.encode("utf-8"))
 
-        similarities_dict[plan] = pickle.loads(cl.recv(1024))
+        similarities_dict[plan] = cl.recv(1024).decode("utf-8")
 
     return json.dumps(similarities_dict, ensure_ascii=False)
