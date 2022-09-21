@@ -9,6 +9,7 @@ import calc
 test_plan_list = {"難所" : 1, "簡単" : 5, "細かい" : 10}
 test_words = {"早さ" : 6, "正確さ" : 9, "実現可能性" : 4, "困難" : 0}
 
+# 最初のウィンドウ
 class Window(QWidget):
     def __init__(self):
         super().__init__()
@@ -26,8 +27,13 @@ class Window(QWidget):
         open_game_btn.clicked.connect(self.createGameWindow)
 
     def createGameWindow(self):
-        new_window = GameWindow()
-        new_window.show()
+        try:
+            new_window = GameWindow()
+            new_window.show()
+        except ConnectionRefusedError:
+            new_window = ErrorWindow()
+            new_window.show()
+            
 
 class GameWindow(QWidget):
     def __init__(self):
@@ -51,6 +57,8 @@ class GameWindow(QWidget):
 
         # ボタンをレイアウトに追加
         layout.addLayout(select_word_list)
+
+        # レイアウトをウィンドウにセットする
         self.w.setLayout(layout)
 
     def makeShowScore(self, score):
@@ -60,6 +68,21 @@ class GameWindow(QWidget):
 
     def show(self):
         self.w.exec()
+
+class ErrorWindow(QWidget):
+    def __init__(self):
+        self.w = QDialog()
+        self.w.resize(200, 100)
+
+        layout = QVBoxLayout()
+        layout.addWidget(QLabel("Error!"))
+
+        self.w.setLayout(layout)
+    
+    def show(self):
+        self.w.exec()
+
+
 
 def createMainWindow():
     app = QApplication([])
