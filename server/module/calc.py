@@ -9,6 +9,10 @@ import json
 import numpy
 from gensim.models import fasttext
 
+# BERT関連
+from transformers import BertJapaneseTokenizer, BertModel
+import torch
+
 ###
 ### 自然言語処理を使用し、渡された2つの単語の類似度を返すサーバー
 ###
@@ -56,13 +60,40 @@ class NLP_COS_SIMILARITY():
         return self.model.wv.similarity(plan, word).astype(numpy.unicode)
 
     # fastTextの立ち上げ
-    def fastTextCalc(self):
+    def calcFastText(self):
         self.model_path = "./models/wiki.ja/wiki.ja.bin"
         self.model = fasttext.load_facebook_model(self.model_path)
 
         self.startServer(self.calcScoreForFastText)
+    
+    # BERTでの特徴量抽出関数
+    def calcEmbeddingForBert(self, text: str):
+        ids = torch.tensor(self.tokenizer.encode(text, add_special_tokens=True)).unsqueeze(0)
+
+        output = self.model_bert(ids)
+        return output.last_hidden_state[0][0]
+
+    # BERTでのcos類似度計算部分
+    def calcCosSimForTorch(self, a, b):
+        return torch.dot(a, b) / (torch.linalg.norm(a) * torch.linalg.norm(b))
+
+    # BERT用の計算部分
+    def calcScoreForBert(self, plan: str, word: str):
+        # Tensor型の指数表記を解除する
+        torch.set_printoptions(sci_mode=False)
+        return str(self.calcCosSimForTorch(self.calcEmbeddingForBert(plan), self.calcEmbeddingForBert(word)).item())
+
+    # BERTの立ち上げ
+    def calcBert(self):
+        self.model_path = "cl-tohoku/bert-base-japanese-whole-word-masking"
+        self.tokenizer = BertJapaneseTokenizer.from_pretrained(self.model_path)
+        self.model_bert = BertModel.from_pretrained(self.model_path)
+
+        self.startServer(self.calcScoreForBert)
 
     # 処理全体の開始
     def startSimilarity(self):
         if self.nlp_type == "fastText":
-            self.fastTextCalc()
+            self.calcFastText()
+        elif self.nlp_type == "BERT":
+            self.calcBert()
