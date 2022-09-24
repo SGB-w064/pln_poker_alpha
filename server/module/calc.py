@@ -22,7 +22,7 @@ class NLP_COS_SIMILARITY():
         self.nlp_type = nlp_type    # 自然言語処理の種類
     
     # 接続したクライアントとのやり取り
-    def connetClient(self, cl, cla, calc_func):
+    def returnCalcAns(self, cl, cla, calc_func):
         while True:
             # json型のオブジェクトを文字列化されたものだけ受け取る
             try:
@@ -49,7 +49,7 @@ class NLP_COS_SIMILARITY():
         while True:
             cl, cla = self.server.accept()
             print(cl, cla)
-            thread = threading.Thread(target=self.connetClient, args=(cl, cla, calc_func))
+            thread = threading.Thread(target=self.returnCalcAns, args=(cl, cla, calc_func))
             thread.start()
 
         self.server.close()
