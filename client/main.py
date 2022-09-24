@@ -23,19 +23,19 @@ class Window(QWidget):
         label.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         layout.addWidget(label)
 
-        open_game_btn = QPushButton("start", self)
-        open_game_btn.clicked.connect(self.createGameWindow)
+        open_game_btn = QPushButton("Calculation start", self)
+        open_game_btn.clicked.connect(self.createCalcWindow)
 
-    def createGameWindow(self):
+    def createCalcWindow(self):
         try:
-            new_window = GameWindow()
+            new_window = CalcWindow()
             new_window.show()
         except ConnectionRefusedError:
             new_window = ErrorWindow()
             new_window.show()
             
 
-class GameWindow(QWidget):
+class CalcWindow(QWidget):
     def __init__(self):
         self.w = QDialog()
         self.w.resize(960, 540)
