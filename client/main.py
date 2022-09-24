@@ -23,9 +23,17 @@ class Window(QWidget):
         label.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         layout.addWidget(label)
 
+        open_single_btn = QPushButton("Single start", self)
+        open_single_btn.clicked.connect(self.createSingleGameWindow)
+        layout.addWidget(open_single_btn,alignment=Qt.AlignmentFlag.AlignCenter)
+
         open_calc_btn = QPushButton("Calculation start", self)
         open_calc_btn.clicked.connect(self.createCalcWindow)
         layout.addWidget(open_calc_btn,alignment=Qt.AlignmentFlag.AlignCenter)
+
+    def createSingleGameWindow(self):
+        new_window = SingleGameWindow()
+        new_window.show()
 
     def createCalcWindow(self):
         try:
@@ -83,7 +91,26 @@ class ErrorWindow(QWidget):
     def show(self):
         self.w.exec()
 
+class SingleGameWindow(QWidget):
+    def __init__(self):
+        self.w = QDialog()
+        self.w.resize(1280,720)
+    
+    def createSettingLayout(self):
+        layout = QVBoxLayout()
 
+        # プレイ人数設定
+        player_count_layout = QHBoxLayout()
+        player_count_label = QLabel("プレイ人数:")
+        player_count_layout.addWidget(player_count_label)
+        player_count_setting = QSpinBox(1)
+        player_count_layout.addWidget(player_count_setting)
+        layout.addLayout(player_count_layout)
+
+        self.w.setLayout(layout)
+
+    def show(self):
+        self.w.exec()
 
 def createMainWindow():
     app = QApplication([])
