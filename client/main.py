@@ -23,8 +23,9 @@ class Window(QWidget):
         label.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         layout.addWidget(label)
 
-        open_game_btn = QPushButton("Calculation start", self)
-        open_game_btn.clicked.connect(self.createCalcWindow)
+        open_calc_btn = QPushButton("Calculation start", self)
+        open_calc_btn.clicked.connect(self.createCalcWindow)
+        layout.addWidget(open_calc_btn,alignment=Qt.AlignmentFlag.AlignCenter)
 
     def createCalcWindow(self):
         try:

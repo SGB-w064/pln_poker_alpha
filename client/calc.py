@@ -4,7 +4,7 @@ import json
 import config
 
 # サーバーのアドレス
-adress = (config.address, 59630)
+adress = (config.calc_address, config.calc_port)
 
 def calc_score(plan_list: dict, word: str):
     # 計算後の単語を格納する辞書型
