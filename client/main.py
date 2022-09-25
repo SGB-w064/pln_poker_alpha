@@ -96,15 +96,21 @@ class SingleGameWindow(QWidget):
         self.w = QDialog()
         self.createSettingLayout()
     
+    # プレイ人数の設定
     def createSettingLayout(self):
         self.w.resize(200,100)
         layout = QFormLayout()
 
         # プレイ人数設定
         player_count = QSpinBox()
+        player_count.setMinimum(1)
         # プレイ人数に応じて、プレイヤー名の設定数を変更する
         player_count.valueChanged.connect(lambda: self.createPlayerNameSetting(player_count, layout))
         layout.addRow("プレイ人数:", player_count)
+
+        # プレイヤー名の設定
+        player_name_setting = QLineEdit()
+        layout.addRow(f"プレイヤー{layout.rowCount()}の名前:",player_name_setting)
         
         self.w.setLayout(layout)
 
