@@ -94,20 +94,35 @@ class ErrorWindow(QWidget):
 class SingleGameWindow(QWidget):
     def __init__(self):
         self.w = QDialog()
-        self.w.resize(1280,720)
+        self.createSettingLayout()
     
     def createSettingLayout(self):
-        layout = QVBoxLayout()
+        self.w.resize(200,100)
+        layout = QFormLayout()
 
         # プレイ人数設定
-        player_count_layout = QHBoxLayout()
-        player_count_label = QLabel("プレイ人数:")
-        player_count_layout.addWidget(player_count_label)
-        player_count_setting = QSpinBox(1)
-        player_count_layout.addWidget(player_count_setting)
-        layout.addLayout(player_count_layout)
-
+        player_count = QSpinBox()
+        # プレイ人数に応じて、プレイヤー名の設定数を変更する
+        player_count.valueChanged.connect(lambda: self.createPlayerNameSetting(player_count, layout))
+        layout.addRow("プレイ人数:", player_count)
+        
         self.w.setLayout(layout)
+
+    def createPlayerNameSetting(self, player_count: QSpinBox, layout: QFormLayout):
+        # プレイヤー名設定
+        
+        # 設定されたプレイヤー数
+        count = player_count.value()
+        # 表示されているプレイヤー名の入力欄数
+        now_count = layout.rowCount() - 1
+
+        if now_count < count:
+            for _ in range(count - now_count):
+                player_name_setting = QLineEdit()
+                layout.addRow(f"Player{layout.rowCount()} name:",player_name_setting)
+        elif now_count > count:
+            for _ in range(now_count - count):
+                layout.removeRow(layout.rowCount() - 1)
 
     def show(self):
         self.w.exec()
