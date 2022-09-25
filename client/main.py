@@ -111,6 +111,11 @@ class SingleGameWindow(QWidget):
         # プレイヤー名の設定
         player_name_setting = QLineEdit()
         layout.addRow(f"プレイヤー{layout.rowCount()}の名前:",player_name_setting)
+
+        # ゲーム画面への遷移
+        start_game_button = QPushButton("ゲーム開始")
+        start_game_button.clicked.connect(lambda: self.startGame())
+        layout.addRow(start_game_button)
         
         self.w.setLayout(layout)
 
@@ -120,15 +125,21 @@ class SingleGameWindow(QWidget):
         # 設定されたプレイヤー数
         count = player_count.value()
         # 表示されているプレイヤー名の入力欄数
-        now_count = layout.rowCount() - 1
+        now_count = layout.rowCount() - 2
 
         if now_count < count:
             for _ in range(count - now_count):
                 player_name_setting = QLineEdit()
-                layout.addRow(f"プレイヤー{layout.rowCount()}の名前:",player_name_setting)
+                layout.insertRow(layout.rowCount() - 1, f"プレイヤー{layout.rowCount() - 1}の名前:",player_name_setting)
         elif now_count > count:
             for _ in range(now_count - count):
-                layout.removeRow(layout.rowCount() - 1)
+                layout.removeRow(layout.rowCount() - 2)
+    
+    def startGame(self):
+        return None
+
+    def createGameLayout(self):
+        return None
 
     def show(self):
         self.w.exec()
