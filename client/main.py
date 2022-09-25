@@ -119,7 +119,7 @@ class SingleGameWindow(QWidget):
         if now_count < count:
             for _ in range(count - now_count):
                 player_name_setting = QLineEdit()
-                layout.addRow(f"Player{layout.rowCount()} name:",player_name_setting)
+                layout.addRow(f"プレイヤー{layout.rowCount()}の名前:",player_name_setting)
         elif now_count > count:
             for _ in range(now_count - count):
                 layout.removeRow(layout.rowCount() - 1)
