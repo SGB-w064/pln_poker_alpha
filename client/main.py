@@ -33,7 +33,7 @@ class Window(QWidget):
         layout.addWidget(open_calc_btn,alignment=Qt.AlignmentFlag.AlignCenter)
 
     def createSingleGameWindow(self):
-        new_window = SingleGameWindow()
+        new_window = SingleGameSettingWindow()
         new_window.show()
 
     def createCalcWindow(self):
@@ -92,7 +92,7 @@ class ErrorWindow(QWidget):
     def show(self):
         self.w.exec()
 
-class SingleGameWindow(QWidget):
+class SingleGameSettingWindow(QWidget):
     def __init__(self):
         self.w = QDialog()
         self.createSettingLayout()
