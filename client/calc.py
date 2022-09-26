@@ -6,7 +6,7 @@ import config
 # サーバーのアドレス
 adress = (config.calc_address, config.calc_port)
 
-def calc_score(plan_list: dict, word: str):
+def calc_score_for_test(plan_list: dict, word: str):
     # 計算後の単語を格納する辞書型
     similarities_dict = {}
 
@@ -20,3 +20,13 @@ def calc_score(plan_list: dict, word: str):
         similarities_dict[plan] = cl.recv(1024).decode("utf-8")
 
     return json.dumps(similarities_dict, ensure_ascii=False)
+
+def calc_score(plan: str, word: str):
+
+    cl = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    cl.connect(adress)
+
+    send_data = json.dumps({"word1" : plan, "word2" : word})
+    cl.send(send_data.encode("utf-8"))
+
+    return cl.recv(1024).decode("utf-8")

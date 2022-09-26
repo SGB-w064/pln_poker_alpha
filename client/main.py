@@ -3,7 +3,7 @@
 from dataclasses import field
 import sys
 from PyQt6.QtWidgets import *
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QAbstractItemModel
 
 import calc
 
@@ -62,7 +62,7 @@ class CalcWindow(QWidget):
         # 選択できる単語を並べる
         for word, _ in test_words.items():
             select_btn = QPushButton(word)
-            select_btn.clicked.connect(self.makeShowScore(calc.calc_score(test_plan_list, word)))
+            select_btn.clicked.connect(self.makeShowScore(calc.calc_score_for_test(test_plan_list, word)))
             select_word_list.addWidget(select_btn)
 
         # ボタンをレイアウトに追加
@@ -142,17 +142,148 @@ class SingleGameSettingWindow(QWidget):
         # プレイヤー名を格納する辞書型
         players_name = {}
 
-        # FormLayout中で文字列を入力する欄があった場合、その文字列からプレイヤー名を引き抜く
+        # FormLayout中で文字列を入力する欄があった場合、その文字列からデータを引き抜く
         for i in reversed(range(layout.rowCount())):
             try:                
-                label = layout.itemAt(i, QFormLayout.ItemRole(0)).widget()
+                label = layout.itemAt(i, layout.ItemRole(0)).widget()
             except AttributeError:
                 label = None
-            field = layout.itemAt(i, QFormLayout.ItemRole(1)).widget()
+            field = layout.itemAt(i, layout.ItemRole(1)).widget()
+            # ラベル名に"名前"が含まれている場合、名前入力欄とし、フィールドから文字列を取り出す
             if type(label) == QLabel and "名前" in label.text() and type(field) == QLineEdit:
                 players_name[f"player{len(players_name) + 1}"] = field.text()
+        
         self.w.close()
-        print(players_name)
+
+        new_window = SingleGameWindow(players_name)
+        new_window.show()
+        
+
+    def show(self):
+        self.w.exec()
+
+class SingleGameWindow(QWidget):
+    def __init__(self, players:dict):
+        
+        self.players = players      # プレイヤー名格納
+        self.tasks = []             # タスク格納
+        self.sentences = {}         # 各プレイヤーの提示した文章格納{player_name:sentences}
+
+        self.w = QDialog()
+        self.w.resize(1280,720)
+        self.w.setLayout(QVBoxLayout())
+        
+        self.createGameLayout()
+
+    def createGameLayout(self):
+        # 遷移部分
+        game_preview = QStackedWidget()
+
+        # Widgetをスタックさせる
+        task_set_widget = QWidget()
+        game_preview.addWidget(task_set_widget)
+        input_widget = QWidget()
+        game_preview.addWidget(input_widget)
+        rank_widget = QWidget()
+        game_preview.addWidget(rank_widget)
+
+        # 遷移1 : タスク一覧設定
+        task_set_layout = QFormLayout()
+        task_set_widget.setLayout(task_set_layout)
+
+        task_set_layout.addRow(QLabel("タスクを設定..."))
+        task_count = QSpinBox()
+        task_count.setMinimum(1)
+        task_count.valueChanged.connect(lambda: self.createTaskInputSetting(task_count, task_set_layout))
+        task_set_layout.addRow("タスク数:", task_count)
+
+        task_set_layout.addRow("タスク1つ目", QLineEdit())
+        
+        task_set_button = QPushButton("タスクを設定する")
+        task_set_button.clicked.connect(lambda:game_preview.setCurrentIndex(1))
+        task_set_button.clicked.connect(lambda:self.setTaskList(task_set_layout))
+        task_set_layout.addRow(task_set_button)
+
+        # 遷移2 : 入力待機
+        input_layout = QVBoxLayout()
+        input_widget.setLayout(input_layout)
+
+        input_layout.addWidget(QLabel("あなたが思う重要視すべき事柄はなにか入力しよう"))
+        input_button = QPushButton("結果表示へ")
+        input_button.clicked.connect(lambda:game_preview.setCurrentIndex(2))
+        input_button.clicked.connect(lambda:self.setSentenceDict(players_layout))
+        input_layout.addWidget(input_button)
+
+        # 遷移3 : 結果表示
+        rank_layout = QVBoxLayout()
+        rank_widget.setLayout(rank_layout)
+        rank_layout.addWidget(QLabel("☆結果発表☆"))
+        calc_button = QPushButton("結果を表示する")
+        calc_button.clicked.connect(lambda:self.setRankingView(rank_layout, calc_button))
+        rank_layout.addWidget(calc_button)
+
+        # 画面遷移する部分をウィンドウレイアウトに仕込む
+        self.w.layout().addWidget(game_preview)
+
+        # 固定部分(プレイヤー表示部)
+        players_layout = QGridLayout()
+        for i in range(len(self.players)):
+            column_layout = QVBoxLayout()
+
+            player_label = QLabel(list(self.players.keys())[i] + " : " + list(self.players.values())[i])
+            player_label.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+            column_layout.addWidget(player_label)
+            
+            player_input = QLineEdit()
+            player_input.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+            column_layout.addWidget(player_input)
+
+            players_layout.addLayout(column_layout, int(i / 5), i % 5)
+        
+        self.w.layout().addLayout(players_layout)
+
+    def setTaskList(self, layout:QFormLayout):
+        for i in range(layout.count()):
+            if layout.itemAt(i, layout.ItemRole(1)) and type(layout.itemAt(i, layout.ItemRole(1)).widget()) == QLineEdit:
+                self.tasks.append(layout.itemAt(i, layout.ItemRole(1)).widget().text())
+    
+    def setSentenceDict(self, layout:QGridLayout):
+        for i in range(layout.rowCount()):
+            for j in range(layout.columnCount()):
+                column = layout.itemAtPosition(i, j)
+                if column is not None:self.sentences[f"{column.itemAt(0).widget().text()}"] = column.itemAt(1).widget().text()
+    
+    def setRankingView(self, layout, button:QPushButton):
+        ranking_dict = {}
+        rank_layout = QVBoxLayout()
+
+        for sentence in self.sentences.items():
+            for task in self.tasks:
+                ranking_dict[f"{sentence[0]} {(task, sentence[1])}"] = calc.calc_score(task, sentence[1])
+
+        sorted_rank_dict = sorted(ranking_dict.items(), key = lambda p : p[1], reverse=True)
+
+        for p, ans in sorted_rank_dict:
+            label = f"{rank_layout.count()+1}位 {p} {ans}点"
+            rank_layout.addWidget(QLabel(label))
+            if rank_layout.count() > 4: pass
+        
+        layout.addLayout(rank_layout)
+        button.close()
+
+    def createTaskInputSetting(self, task_count: QSpinBox, layout: QFormLayout):
+        # 設定されたタスク数
+        count = task_count.value()
+        # 現在のタスクの入力欄数
+        now_count = len([layout.itemAt(i, layout.ItemRole(1)) for i in range(layout.count()) if layout.itemAt(i, layout.ItemRole(0)) and "目" in layout.itemAt(i, layout.ItemRole(0)).widget().text()])
+
+        if now_count < count:
+            for _ in range(count - now_count):
+                task_setting = QLineEdit()
+                layout.insertRow(layout.rowCount() - 1, f"タスク{layout.rowCount() - 2}つ目:",task_setting)
+        elif now_count > count:
+            for _ in range(now_count - count):
+                layout.removeRow(layout.rowCount() - 2)
 
     def show(self):
         self.w.exec()
