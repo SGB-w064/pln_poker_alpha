@@ -1,8 +1,9 @@
 #!python3.8
 
+from dataclasses import field
 import sys
 from PyQt6.QtWidgets import *
-from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtCore import Qt
 
 import calc
 
@@ -136,10 +137,22 @@ class SingleGameWindow(QWidget):
                 layout.removeRow(layout.rowCount() - 2)
     
     def startGame(self):
-        return None
+        # 設定したレイアウトを取得
+        layout:QFormLayout = self.w.layout()
+        # プレイヤー名を格納する辞書型
+        players_name = {}
 
-    def createGameLayout(self):
-        return None
+        # FormLayout中で文字列を入力する欄があった場合、その文字列からプレイヤー名を引き抜く
+        for i in reversed(range(layout.rowCount())):
+            try:                
+                label = layout.itemAt(i, QFormLayout.ItemRole(0)).widget()
+            except AttributeError:
+                label = None
+            field = layout.itemAt(i, QFormLayout.ItemRole(1)).widget()
+            if type(label) == QLabel and "名前" in label.text() and type(field) == QLineEdit:
+                players_name[f"player{len(players_name) + 1}"] = field.text()
+        self.w.close()
+        print(players_name)
 
     def show(self):
         self.w.exec()
