@@ -9,3 +9,6 @@ __pycache__
 
 # デバッグ用batファイル
 debug.bat
+
+# デバッグ用shファイル
+debug.sh
