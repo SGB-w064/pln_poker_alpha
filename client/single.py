@@ -179,7 +179,9 @@ class SingleGameWindow(QWidget):
         for p, ans in sorted_rank_dict:
             label = f"{rank_layout.count()+1}位 {p} {ans}点"
             rank_layout.addWidget(QLabel(label))
-            if rank_layout.count() > 4: pass
+            if rank_layout.count() > 4:
+                rank_layout.addWidget(QLabel(f"6位以下の{len(sorted_rank_dict)-rank_layout.count()}個は省略"))
+                break
         
         layout.addLayout(rank_layout)
         button.close()
