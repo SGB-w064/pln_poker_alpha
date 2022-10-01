@@ -1,6 +1,5 @@
 #!python3.8
 
-from dataclasses import field
 import sys
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import Qt, QAbstractItemModel

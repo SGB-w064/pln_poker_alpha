@@ -31,8 +31,9 @@ class NLP_COS_SIMILARITY():
                 # 上記以外の文字列が来た場合
                 cl.send("計算失敗".encode("utf-8"))
             
-            # 送られてくるデータは比較する2つの単語の辞書と仮定
-            # 例 data = ["hoge", "huga"]
+            # 送られてくるデータは比較する2つの単語の辞書と仮定.
+            # keyは固定でword1とword2のみ
+            # 例 data = {"word1" : "hoge", "word2" : "huga"}
             if type(data) is dict and list(data.keys()) == ["word1", "word2"]:
                 cl.send(calc_func(data["word1"], data["word2"]).encode("utf-8"))
             else:
