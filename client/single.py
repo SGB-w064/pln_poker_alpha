@@ -1,6 +1,7 @@
 #python3.8
 
 from PyQt6.QtWidgets import *
+from PyQt6.QtCore import Qt
 
 import calc
 
@@ -55,7 +56,7 @@ class SingleGameSettingWindow(QWidget):
         players_name = {}
 
         # FormLayout中で文字列を入力する欄があった場合、その文字列からデータを引き抜く
-        for i in reversed(range(layout.rowCount())):
+        for i in range(layout.rowCount()):
             try:                
                 label = layout.itemAt(i, layout.ItemRole(0)).widget()
             except AttributeError:
