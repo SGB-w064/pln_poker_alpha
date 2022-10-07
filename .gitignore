@@ -9,3 +9,6 @@ __pycache__
 
 # デバッグ用batファイル
 debug.bat
+
+# メモとか色々フォルダ
+/others
