@@ -12,3 +12,6 @@ debug.bat
 
 # メモとか色々フォルダ
 /others
+
+# デバッグ用shファイル
+debug.sh
