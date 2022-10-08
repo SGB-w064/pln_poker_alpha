@@ -1,5 +1,6 @@
 #python3.8
 
+from ctypes import alignment
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import Qt
 
@@ -117,6 +118,12 @@ class SingleGameWindow(QWidget):
         task_set_button.clicked.connect(lambda:self.setTaskList(task_set_layout))
         task_set_layout.addRow(task_set_button)
 
+        task_ex_layout = QVBoxLayout()
+        task_ex = QPushButton("例")
+        task_ex.clicked.connect(lambda:self.setExampleTask(task_set_layout))
+        task_ex_layout.addWidget(task_ex,alignment=Qt.AlignmentFlag.AlignRight)
+        task_set_layout.addRow(task_ex_layout)
+
         # 遷移2 : 入力待機
         input_layout = QVBoxLayout()
         input_widget.setLayout(input_layout)
@@ -200,5 +207,11 @@ class SingleGameWindow(QWidget):
             for _ in range(now_count - count):
                 layout.removeRow(layout.rowCount() - 2)
 
+    def setExampleTask(self, layout: QFormLayout):
+        return None
+    
+    def setExamplePlan(self, layout: QGridLayout):
+        return None
+    
     def show(self):
         self.w.exec()
