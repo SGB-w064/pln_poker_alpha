@@ -1,6 +1,5 @@
 #python3.8
 
-from ctypes import alignment
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import Qt
 
@@ -14,22 +13,26 @@ class SingleGameSettingWindow(QWidget):
     # プレイ人数の設定
     def createSettingLayout(self):
         self.w.resize(200,100)
+        # 画面のレイアウト設定
         layout = QFormLayout()
+        # プレイヤー名の入力フォームのレイアウト
+        name_input_layout = QFormLayout()
 
         # プレイ人数設定
         player_count = QSpinBox()
         player_count.setMinimum(1)
         # プレイ人数に応じて、プレイヤー名の設定数を変更する
-        player_count.valueChanged.connect(lambda: self.createPlayerNameSetting(player_count, layout))
+        player_count.valueChanged.connect(lambda: self.createPlayerNameSetting(player_count, name_input_layout))
         layout.addRow("プレイ人数:", player_count)
 
         # プレイヤー名の設定
         player_name_setting = QLineEdit()
-        layout.addRow(f"プレイヤー{layout.rowCount()}の名前:",player_name_setting)
+        name_input_layout.addRow(f"プレイヤー{layout.rowCount()}の名前:",player_name_setting)
+        layout.addRow(name_input_layout)
 
         # ゲーム画面への遷移
         start_game_button = QPushButton("ゲーム開始")
-        start_game_button.clicked.connect(lambda: self.startGame())
+        start_game_button.clicked.connect(lambda: self.startGame(name_input_layout))
         layout.addRow(start_game_button)
         
         self.w.setLayout(layout)
@@ -40,32 +43,23 @@ class SingleGameSettingWindow(QWidget):
         # 設定されたプレイヤー数
         count = player_count.value()
         # 表示されているプレイヤー名の入力欄数
-        now_count = layout.rowCount() - 2
+        now_count = layout.rowCount()
 
         if now_count < count:
             for _ in range(count - now_count):
                 player_name_setting = QLineEdit()
-                layout.insertRow(layout.rowCount() - 1, f"プレイヤー{layout.rowCount() - 1}の名前:",player_name_setting)
+                layout.insertRow(layout.rowCount(), f"プレイヤー{layout.rowCount() + 1}の名前:", player_name_setting)
         elif now_count > count:
             for _ in range(now_count - count):
-                layout.removeRow(layout.rowCount() - 2)
+                layout.removeRow(layout.rowCount() - 1)
     
-    def startGame(self):
-        # 設定したレイアウトを取得
-        layout:QFormLayout = self.w.layout()
+    def startGame(self, names_layout:QFormLayout):
         # プレイヤー名を格納する辞書型
         players_name = {}
 
-        # FormLayout中で文字列を入力する欄があった場合、その文字列からデータを引き抜く
-        for i in range(layout.rowCount()):
-            try:                
-                label = layout.itemAt(i, layout.ItemRole(0)).widget()
-            except AttributeError:
-                label = None
-            field = layout.itemAt(i, layout.ItemRole(1)).widget()
-            # ラベル名に"名前"が含まれている場合、名前入力欄とし、フィールドから文字列を取り出す
-            if type(label) == QLabel and "名前" in label.text() and type(field) == QLineEdit:
-                players_name[f"player{len(players_name) + 1}"] = field.text()
+        for j in range(names_layout.rowCount()):
+            field = names_layout.itemAt(j, names_layout.ItemRole(1)).widget()
+            players_name[f"player{len(players_name) + 1}"] = field.text()
         
         self.w.close()
 
@@ -102,20 +96,25 @@ class SingleGameWindow(QWidget):
         game_preview.addWidget(rank_widget)
 
         # 遷移1 : タスク一覧設定
+        # タスクを設定する画面部分全体のレイアウト
         task_set_layout = QFormLayout()
+        # タスクを入力する入力フォームのペアのみを格納するレイアウト
+        task_input_layout = QFormLayout()
+
         task_set_widget.setLayout(task_set_layout)
 
         task_set_layout.addRow(QLabel("タスクを設定..."))
         task_count = QSpinBox()
         task_count.setMinimum(1)
-        task_count.valueChanged.connect(lambda: self.createTaskInputSetting(task_count, task_set_layout))
+        task_count.valueChanged.connect(lambda: self.createTaskInputSetting(task_count, task_input_layout))
         task_set_layout.addRow("タスク数:", task_count)
 
-        task_set_layout.addRow("タスク1つ目", QLineEdit())
+        task_input_layout.addRow("タスク1つ目", QLineEdit())
+        task_set_layout.addRow(task_input_layout)
         
         task_set_button = QPushButton("タスクを設定する")
         task_set_button.clicked.connect(lambda:game_preview.setCurrentIndex(1))
-        task_set_button.clicked.connect(lambda:self.setTaskList(task_set_layout))
+        task_set_button.clicked.connect(lambda:self.setTaskList(task_input_layout))
         task_set_layout.addRow(task_set_button)
 
         task_ex_layout = QVBoxLayout()
@@ -163,9 +162,8 @@ class SingleGameWindow(QWidget):
         self.w.layout().addLayout(players_layout)
 
     def setTaskList(self, layout:QFormLayout):
-        for i in range(layout.count()):
-            if layout.itemAt(i, layout.ItemRole(1)) and type(layout.itemAt(i, layout.ItemRole(1)).widget()) == QLineEdit:
-                self.tasks.append(layout.itemAt(i, layout.ItemRole(1)).widget().text())
+        for i in range(layout.rowCount()):
+            self.tasks.append(layout.itemAt(i, layout.ItemRole(1)).widget().text())
     
     def setSentenceDict(self, layout:QGridLayout):
         for i in range(layout.rowCount()):
@@ -202,10 +200,10 @@ class SingleGameWindow(QWidget):
         if now_count < count:
             for _ in range(count - now_count):
                 task_setting = QLineEdit()
-                layout.insertRow(layout.rowCount() - 1, f"タスク{layout.rowCount() - 2}つ目:",task_setting)
+                layout.addRow(f"タスク{layout.rowCount() + 1}つ目:", task_setting)
         elif now_count > count:
             for _ in range(now_count - count):
-                layout.removeRow(layout.rowCount() - 2)
+                layout.removeRow(layout.rowCount() - 1)
 
     def setExampleTask(self, layout: QFormLayout):
         return None
