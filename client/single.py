@@ -1,5 +1,6 @@
 #python3.8
 
+from ctypes import alignment
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import Qt
 
@@ -160,6 +161,11 @@ class SingleGameWindow(QWidget):
             players_layout.addLayout(column_layout, int(i / 5), i % 5)
         
         self.w.layout().addLayout(players_layout)
+
+        # プレイヤーの入力部の例
+        input_ex = QPushButton("例")
+        input_ex.clicked.connect(lambda:self.setExamplePlan(players_layout))
+        self.w.layout().addWidget(input_ex, alignment=Qt.AlignmentFlag.AlignRight)
 
     def setTaskList(self, layout:QFormLayout):
         for i in range(layout.rowCount()):
