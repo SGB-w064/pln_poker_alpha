@@ -78,6 +78,10 @@ class SingleGameWindow(QWidget):
         self.tasks = []             # タスク格納
         self.sentences = {}         # 各プレイヤーの提示した文章格納{player_name:sentences}
 
+        # タスクリストの例
+        # IPAの要件定義事例のシステム機能階層図の販売管理システム部分から引用
+        self.ex_task_list = ["新規取引申請", "信用調査結果登録", "受注案件登録", "受注内容登録", "出荷予定登録", "出荷依頼"]
+
         self.w = QDialog()
         self.w.resize(1280,720)
         self.w.setLayout(QVBoxLayout())
@@ -120,7 +124,7 @@ class SingleGameWindow(QWidget):
 
         task_ex_layout = QVBoxLayout()
         task_ex = QPushButton("例")
-        task_ex.clicked.connect(lambda:self.setExampleTask(task_set_layout))
+        task_ex.clicked.connect(lambda:self.setExampleTask(task_input_layout, task_count))
         task_ex_layout.addWidget(task_ex,alignment=Qt.AlignmentFlag.AlignRight)
         task_set_layout.addRow(task_ex_layout)
 
@@ -211,8 +215,18 @@ class SingleGameWindow(QWidget):
             for _ in range(now_count - count):
                 layout.removeRow(layout.rowCount() - 1)
 
-    def setExampleTask(self, layout: QFormLayout):
-        return None
+    def setExampleTask(self, layout: QFormLayout, spinbox: QSpinBox):
+        # 入力フォームにタスク例の中から入れていく
+        for i in range(layout.rowCount()):
+            try:
+                form:QLineEdit = layout.itemAt(i, layout.ItemRole(1)).widget()
+                form.setText(self.ex_task_list[i])
+            except :
+                layout.removeRow(layout.rowCount() - 1)
+                pass
+        
+        if layout.rowCount() != spinbox.value():
+            spinbox.setValue(layout.rowCount())
     
     def setExamplePlan(self, layout: QGridLayout):
         return None
