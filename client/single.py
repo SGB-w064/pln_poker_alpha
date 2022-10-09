@@ -1,6 +1,6 @@
 #python3.8
 
-from ctypes import alignment
+import random
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import Qt
 
@@ -120,6 +120,7 @@ class SingleGameWindow(QWidget):
         task_set_button = QPushButton("タスクを設定する")
         task_set_button.clicked.connect(lambda:game_preview.setCurrentIndex(1))
         task_set_button.clicked.connect(lambda:self.setTaskList(task_input_layout))
+        task_set_button.clicked.connect(lambda:input_ex.setVisible(True))
         task_set_layout.addRow(task_set_button)
 
         task_ex_layout = QVBoxLayout()
@@ -159,6 +160,7 @@ class SingleGameWindow(QWidget):
             column_layout.addWidget(player_label)
             
             player_input = QLineEdit()
+            player_input.setFixedWidth(self.w.width() / 6)
             player_input.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
             column_layout.addWidget(player_input)
 
@@ -169,6 +171,7 @@ class SingleGameWindow(QWidget):
         # プレイヤーの入力部の例
         input_ex = QPushButton("例")
         input_ex.clicked.connect(lambda:self.setExamplePlan(players_layout))
+        input_ex.setVisible(False)
         self.w.layout().addWidget(input_ex, alignment=Qt.AlignmentFlag.AlignRight)
 
     def setTaskList(self, layout:QFormLayout):
@@ -229,7 +232,16 @@ class SingleGameWindow(QWidget):
             spinbox.setValue(layout.rowCount())
     
     def setExamplePlan(self, layout: QGridLayout):
-        return None
+        # タスクに対して付け加える文字列リスト
+        add_list = ["を優先するべき", "をやったほうがいいと考える", "がやりたい", "が重要である"]
+
+        # SystemRandomクラス
+        rnd = random.SystemRandom()
+
+        for i in range(layout.count()):
+            player_layout: QVBoxLayout = layout.itemAtPosition(int(i / layout.columnCount()), i % layout.columnCount())
+            player_input_area: QLineEdit = player_layout.itemAt(player_layout.count() - 1).widget()
+            player_input_area.setText("{}{}".format(self.tasks[rnd.randint(0, len(self.tasks) - 1)], add_list[rnd.randint(0, len(add_list) - 1)]))
     
     def show(self):
         self.w.exec()
