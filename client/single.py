@@ -190,7 +190,7 @@ class SingleGameWindow(QWidget):
 
         for sentence in self.sentences.items():
             for task in self.tasks:
-                ranking_dict[f"{sentence[0]} {(task, sentence[1])}"] = calc.calc_score(task, sentence[1])
+                ranking_dict[f"{sentence[0]} {(task, sentence[1])}"] = str(round(float(calc.calc_score(task, sentence[1])) * 100, 2))
 
         sorted_rank_dict = sorted(ranking_dict.items(), key = lambda p : p[1], reverse=True)
 
