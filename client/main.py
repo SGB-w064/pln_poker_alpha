@@ -79,7 +79,7 @@ class CalcWindow(QWidget):
     def show(self):
         self.w.exec()
 
-class ErrorWindow(QWidget):
+class ErrorWindow(QDialog):
     def __init__(self):
         self.w = QDialog()
         self.w.resize(200, 100)
