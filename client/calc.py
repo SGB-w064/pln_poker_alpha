@@ -30,3 +30,12 @@ def calc_score(plan: str, word: str):
     cl.send(send_data.encode("utf-8"))
 
     return cl.recv(1024).decode("utf-8")
+
+def main():
+    word1 = input("word1 : ")
+    word2 = input("word2 : ")
+    ans = calc_score(word1, word2)
+    print(ans)
+
+if __name__ == "__main__":
+    main()
