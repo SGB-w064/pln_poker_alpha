@@ -29,7 +29,11 @@ def calc_score(plan: str, word: str):
     send_data = json.dumps({"word1" : plan, "word2" : word})
     cl.send(send_data.encode("utf-8"))
 
-    return cl.recv(1024).decode("utf-8")
+    ans = cl.recv(1024).decode("utf-8")
+
+    cl.close()
+
+    return ans
 
 def main():
     word1 = input("word1 : ")
